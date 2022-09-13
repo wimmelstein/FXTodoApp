@@ -33,6 +33,7 @@ public class TodoController implements Initializable {
     public void onLoadMenuItemClick(ActionEvent event) {
         todoItemService.load();
         todoItems = FXCollections.observableList(todoItemService.getItems());
+        tableView.setItems(todoItems);
     }
 
     public void onSaveMenuItemClick(ActionEvent event) {
