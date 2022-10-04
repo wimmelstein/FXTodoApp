@@ -3,12 +3,9 @@ package nl.inholland.fxtodoapp;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,11 +15,13 @@ public class TodoController implements Initializable {
     @FXML
     private TextField descriptionTextield;
     @FXML
-    private TableView tableView;
+    private TableView<TodoItem> tableView;
     private TodoItemService todoItemService;
     private ObservableList<TodoItem> todoItems;
+    @FXML
+    private Label message;
 
-    public void onAddButtonClick(ActionEvent event) {
+    public void onAddButtonClick() {
         if (!descriptionTextield.getText().isEmpty()) {
             TodoItem item = new TodoItem(descriptionTextield.getText(), false);
             todoItems.add(item);
@@ -30,17 +29,26 @@ public class TodoController implements Initializable {
         }
     }
 
-    public void onLoadMenuItemClick(ActionEvent event) {
+    public void setMessage(String input) {
+        message.setText(input);
+    }
+
+    public void onDeleteButtonClick() {
+        ObservableList<TodoItem> selectedItems = tableView.getSelectionModel().getSelectedItems();
+        todoItems.removeAll(selectedItems);
+    }
+
+    public void onLoadMenuItemClick() {
         todoItemService.load();
         todoItems = FXCollections.observableList(todoItemService.getItems());
         tableView.setItems(todoItems);
     }
 
-    public void onSaveMenuItemClick(ActionEvent event) {
+    public void onSaveMenuItemClick() {
         todoItemService.save();
     }
 
-    public void onCloseMenuItemClick(ActionEvent event) {
+    public void onCloseMenuItemClick() {
         Platform.exit();
         System.exit(0);
     }
@@ -48,10 +56,10 @@ public class TodoController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        // Load in the todo items
-        todoItemService = new TodoItemService();
+        todoItemService = new TodoItemService(this);
         todoItems = FXCollections.observableList(todoItemService.getItems());
 
+        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         // Configure the TableView
         tableView.setItems(todoItems);
 
